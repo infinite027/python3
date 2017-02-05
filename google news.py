@@ -2,7 +2,30 @@ from bs4 import BeautifulSoup
 import os
 import urllib.request
 from datetime import date
+import re
 
+def removeTags(string):
+    string=str(string)
+    string.replace('"',"'")
+    start=[]
+    end=[]
+    for count in range(len(string)):
+        if string[count]=="<":
+            start.append(count)
+        if string[count]==">":
+            end.append(count)
+    print(end)
+    print(start)
+    try:
+        end=end[0]
+        start=start[1]
+        string=string[end+1:start]
+        return string
+    except:
+        return 0
+            
+                
+            
 def main():
     file=open("C:\\Users\\xinyu\\Desktop\\News Everyday.txt",'a')
     today=date.today()
@@ -16,12 +39,19 @@ def main():
     for letter in letters:
         selector='#MAA4AEg'+letter+'UABgAWoCY2E > span'
         new=soup.select(selector)
-        if(new):
+        new=str(new)
+        new.replace("["," ")
+        new.replace("]"," ")
+        if new:
             news.append(new)
     for new in news:
-        print(new,end='\n')
-        file.write(str(new))
-        file.write('\n')
+        new=removeTags(new)
+        if new != 0:
+            print(new,end='\n')
+            file.write(str(new))
+            file.write('\n')
+        else:
+            break
     file.write('\n')
     file.close()
     os.system('pause')
