@@ -1,61 +1,26 @@
-from bs4 import BeautifulSoup
+#! /usr/bin/python3.5
+from lxml import etree
 import os
-import urllib.request
+import urllib.request as req
 from datetime import date
-import re
 
-def removeTags(string):
-    string=str(string)
-    string.replace('"',"'")
-    start=[]
-    end=[]
-    for count in range(len(string)):
-        if string[count]=="<":
-            start.append(count)
-        if string[count]==">":
-            end.append(count)
-    print(end)
-    print(start)
-    try:
-        end=end[0]
-        start=start[1]
-        string=string[end+1:start]
-        return string
-    except:
-        return 0
-            
-                
-            
+
 def main():
     file=open("C:\\Users\\xinyu\\Desktop\\News Everyday.txt",'a')
-    today=date.today()
-    file.write(str(today))
-    file.write('\n')
-    url = "http://news.google.ca/"
-    url_content = urllib.request.urlopen(url).read()
-    soup = BeautifulSoup(url_content,'html.parser')
-    news = []
-    letters=['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
-    for letter in letters:
-        selector='#MAA4AEg'+letter+'UABgAWoCY2E > span'
-        new=soup.select(selector)
-        new=str(new)
-        new.replace("["," ")
-        new.replace("]"," ")
-        if new:
-            news.append(new)
-    for new in news:
-        new=removeTags(new)
-        if new != 0:
-            print(new,end='\n')
-            file.write(str(new))
-            file.write('\n')
-        else:
-            break
-    file.write('\n')
-    file.close()
-    os.system('pause')
-
+    file.write("\n");
+    file.write(str(date.today())+"\n")
+    url = 'https://news.google.com/news/?ned=ca&hl=en-CA'
+    content = req.urlopen(url).read()
+    content = etree.HTML(content)
+    xpaths = [ '//*[@id="yDmH0d"]/c-wiz/c-wiz/main/div[1]/div[1]/c-wiz/div/c-wiz[1]/c-wiz/div/div[2]/c-wiz[1]/a','//*[@id="yDmH0d"]/c-wiz/c-wiz/main/div[1]/div[1]/c-wiz/div/c-wiz[2]/c-wiz/div/div[2]/c-wiz/a','//*[@id="yDmH0d"]/c-wiz/c-wiz/main/div[1]/div[1]/c-wiz/div/c-wiz[3]/c-wiz/div/div[2]/c-wiz/a','//*[@id="yDmH0d"]/c-wiz/c-wiz/main/div[1]/div[1]/c-wiz/div/c-wiz[4]/c-wiz/div/div/c-wiz[1]/a','//*[@id="yDmH0d"]/c-wiz/c-wiz/main/div[1]/div[1]/c-wiz/div/c-wiz[5]/c-wiz/div/div[2]/c-wiz/a','//*[@id="yDmH0d"]/c-wiz/c-wiz/main/div[1]/div[1]/c-wiz/div/c-wiz[6]/c-wiz/div/div[2]/c-wiz[1]/a']
+    for xpath in xpaths:
+        temp = content.xpath(xpath)
+        for each in temp:
+            print(str(each.text)+"\n")
+            file.write(str(each.text)+"\n")
+    print("done")
+    os.system("pause")
+    
 if __name__=="__main__":
     file=open("C:\\Users\\xinyu\\Desktop\\News Everyday.txt",'r')
     ver=str(date.today())+'\n'
